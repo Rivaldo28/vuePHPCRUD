@@ -1,0 +1,149 @@
+<!--Autor Rivaldo Souza-->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+    <div class="container-fluid">
+      <div class="row bg-dark">
+        <div class="col-lg-12">
+          <p class="text-center text-light display-4 pt-2" style="font-size:25px;">Sistema de Cadastro com PHP</p>
+        </div><!--col-lg-12-->
+      </div><!--row bg-dark-->
+    </div><!--container-fluid-->
+
+    <div class="container">
+      <div class="row mt-3">
+        <div class="col-lg-6">
+          <h3 class="text-info">Registrar Pessoas</h3><!--textinfo-->
+        </div><!--col-lg-6-->
+        <div class="col-lg-6">
+          <button class="btn btn-info float-right" @click="showModal=true">
+            <i class="fas fa-user"></i>&nbsp;&nbsp;Adicionar nova Pessoa
+          </button>
+        </div><!--col-lg-6-->
+      </div><!--row mt-3-->
+    
+      <hr class="g-info">
+
+      <div class="alert alert-danger" v-if="errorMsg">{{errorMsg}}</div><!--alert-danger-->
+      <div class="alert alert-success" v-if="successMsg">{{successMsg}}</div><!--alert-success-->
+
+      <div class="row">
+        <div class="col-lg-12">
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr class="text-center bg-info text-light" >
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Data de Nascimento</th>
+                <th>Editar</th>
+                <th>Deletar</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="text-center" v-for="pessoa in pessoas">
+                <td >{{ pessoa.id }}</td>
+                <td>{{ pessoa.nome }}</td>
+                <td>{{ pessoa.ano }}</td>
+                
+                <td><a href="#" class="text-success"@click="editModal=true; selectPessoa(pessoa);"><i class="fas fa-edit" ></i></a></td>
+                <td><a href="#" class="text-danger" @click="deleteModal=true"><i class="fas fa-trash-alt"></i></a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div><!--col-lg-12-->
+      </div><!--row-->
+    </div><!--container-->
+
+    <!--Adicionando modal-->
+    <div id="overlay" v-if="showModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Adicionando Nova Pessoa</h5><!--modal-title-->
+            <button type="button" class="close" @click="showModal=false">
+              <span aria-hidden="true">&times;</span>
+            </button><!--close-->
+          </div><!--modal-header-->
+          <div class="modal-body p-4">
+            <form action="#" method="post">
+              <div class="form-group">
+                <input type="text" name="nome" class="form-control form-control-lg" placeholder="Nome" v-model="newPessoa.nome">
+              </div><!--form-group-->
+              <div class="form-group">
+                <input type="date" name="ano" class="form-control form-control-lg" placeholder="Data de Nascimento" v-model="newPessoa.ano">
+              </div><!--form-group-->
+              <div class="form-group">
+                <button class="btn btn-info btn-block btn-lg" @click="showModal=false; addPessoa();" >Inserir</button>
+              </div><!--form-group-->
+            </form>
+          </div><!--modal-body-->
+        </div><!--modal-content-->
+      </div><!--modal-dialog-->
+    </div><!--overlay-->
+
+    <!--Editar modal-->
+    <div id="overlay" v-if="editModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Editar Pessoa</h5><!--modal-title-->
+            <button type="button" class="close" @click="editModal=false">
+              <span aria-hidden="true">&times;</span>
+            </button><!--close-->
+          </div><!--modal-header-->
+          <div class="modal-body p-4">
+            <form action="#" method="post">
+              <div class="form-group">
+                <input type="text" name="nome" class="form-control form-control-lg" placeholder="Nome" v-model="currentPessoa.nome">
+              </div><!--form-group-->
+              <div class="form-group">
+                <input type="date" name="ano" class="form-control form-control-lg" placeholder="Data de Nascimento" v-model="currentPessoa.ano">
+              </div><!--form-group-->
+              <div class="form-group">
+                <button class="btn btn-info btn-block btn-lg" @click="editModal=false; updatePessoa()">Atualizar</button>
+              </div><!--form-group-->
+            </form>
+          </div><!--modal-body-->
+        </div><!--modal-content-->
+      </div><!--modal-dialog-->
+    </div><!--overlay-->
+
+    <!--modal Delete-->
+    <div id="overlay" v-if="deleteModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Deletar Pessoa</h5><!--modal-title-->
+            <button type="button" class="close" @click="deleteModal=false">
+              <span aria-hidden="true">&times;</span>
+            </button><!--close-->
+          </div><!--modal-header-->
+          <div class="modal-body p-4">
+            <h4 class="text-danger">Você tem certeza que deseja deletar esta pessoa?</h4>
+            <h5>Você está deletando '{{ currentPessoa.nome }}'</h5>
+            <button class="btn btn-danger btn-lg" @click="deleteModal=false; deletePessoa();">Sim</button>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="btn btn-success btn-lg" @click="deleteModal=false">Não</button>
+          </div><!--modal-body-->
+        </div><!--modal-content-->
+      </div><!--modal-dialog-->
+    </div><!--overlay-->
+
+
+  </div><!--app-->
+  <script src="js/jquery-3.4.1.min.js"></script>
+  <script src="js/axios.min.js"></script>
+  <script src="js/all.js"></script>
+  <script src="js/vue.js"></script>
+  <script src="js/script.vue"></script>
+  
+</body>
+</html>
